@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Rifqy Al-Qur'an</title>
+    
+    <link rel="stylesheet" href="style.css">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="oled-theme">
+
+    <header class="main-header" id="main-header">
+        <div class="user-greeting">
+            <div class="avatar">R</div>
+            <div>
+                <p>Assalamu'alaikum 👋</p>
+                <small>Rifqy Al-Qur'an Professional</small>
+            </div>
+        </div>
+        <button class="icon-btn" onclick="openSettings()"><i class="fas fa-cog"></i></button>
+    </header>
+
+    <main id="app-content">
+        
+        <section id="dashboard" class="page active">
+            <div class="ramadan-card" onclick="switchPage('ramadan')">
+                <div class="card-badge">🌙 EDISI SPESIAL</div>
+                <h3>Menuju Ramadan</h3>
+                <p class="hijri-date">29 Sha'ban 1447H</p>
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <span>MENUJU BERBUKA</span>
+                        <strong id="countdown-timer">00:00:00</strong>
+                    </div>
+                    <div class="stat-item">
+                        <span>KHATAM</span>
+                        <strong id="khatam-progress">0%</strong>
+                    </div>
+                    <div class="stat-item">
+                        <span>AMAL</span>
+                        <strong id="amal-count">0/5</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="prayer-widget">
+                <div class="prayer-info">
+                    <i class="fas fa-mosque"></i>
+                    <div>
+                        <small>BERIKUTNYA</small>
+                        <h4 id="next-prayer-name">Maghrib</h4>
+                        <p><i class="fas fa-location-dot"></i> Jakarta</p>
+                    </div>
+                </div>
+                <div class="prayer-timer">
+                    <strong id="next-prayer-time">18:15</strong>
+                </div>
+            </div>
+
+            <div id="last-read-container"></div>
+            
+            <div class="section-title">Daftar Surat</div>
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="search-input" placeholder="Cari surat..." oninput="filterSurah()">
+            </div>
+            <div id="surah-list-container">
+                <div class="loading">Memuat Surat...</div>
+            </div>
+        </section>
+
+        <section id="read-view" class="page">
+            <div class="read-header">
+                <button onclick="switchPage('dashboard')"><i class="fas fa-arrow-left"></i></button>
+                <h3 id="current-surah-name">Surat</h3>
+                <button onclick="toggleAudio()"><i class="fas fa-play" id="btn-header-play"></i></button>
+            </div>
+            <div id="ayah-container" class="ayah-list"></div>
+        </section>
+
+        <section id="ramadan" class="page">
+            <div class="read-header">
+                <button onclick="switchPage('dashboard')"><i class="fas fa-arrow-left"></i></button>
+                <h3>Ramadan Tools</h3>
+            </div>
+
+            <div class="tab-nav">
+                <button class="tab-btn active" onclick="switchTab('tab-tracker')">Tracker</button>
+                <button class="tab-btn" onclick="switchTab('tab-zakat')">Zakat</button>
+            </div>
+
+            <div id="tab-tracker" class="tab-content active">
+                <div class="card-box">
+                    <h4>Amal Yaumi (Harian)</h4>
+                    <div id="amal-list">
+                        </div>
+                </div>
+            </div>
+
+            <div id="tab-zakat" class="tab-content">
+                <div class="card-box">
+                    <h4><i class="fas fa-calculator"></i> Zakat Fitrah</h4>
+                    <div class="input-group">
+                        <label>Harga Beras (per Kg)</label>
+                        <input type="number" id="harga-beras" value="15000" oninput="hitungZakat()">
+                    </div>
+                    <div class="input-group">
+                        <label>Jumlah Jiwa</label>
+                        <input type="number" id="jumlah-jiwa" value="1" oninput="hitungZakat()">
+                    </div>
+                    <div class="result-box">
+                        <small>Total Bayar</small>
+                        <h2 id="total-zakat">Rp 37.500</h2>
+                    </div>
+                </div>
+                
+                <div class="card-box" style="margin-top:15px;">
+                    <h4><i class="fas fa-coins"></i> Zakat Maal</h4>
+                    <p style="font-size:12px; color:#888;">Nisab: Setara 85 gram emas</p>
+                    <div class="input-group">
+                        <label>Total Harta (Rp)</label>
+                        <input type="number" id="total-harta" placeholder="0" oninput="hitungZakat()">
+                    </div>
+                    <div class="result-box">
+                        <small>Zakat Maal (2.5%)</small>
+                        <h2 id="total-maal">Rp 0</h2>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <nav class="bottom-nav">
+        <div class="nav-item active" onclick="switchPage('dashboard')">
+            <i class="fas fa-book-open"></i>
+            <span>Quran</span>
+        </div>
+        <div class="nav-item">
+            <i class="fas fa-circle-dot"></i>
+            <span>Tasbih</span>
+        </div>
+        <div class="nav-item-center" onclick="switchPage('ramadan')">
+            <div class="center-circle">
+                <i class="fas fa-star-and-crescent"></i>
+            </div>
+        </div>
+        <div class="nav-item">
+            <i class="fas fa-heart"></i>
+            <span>Simpan</span>
+        </div>
+        <div class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>Akun</span>
+        </div>
+    </nav>
+
+    <div id="modal-settings" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>PENGATURAN OLED</h3>
+                <i class="fas fa-times" onclick="closeSettings()"></i>
+            </div>
+            <div class="setting-item">
+                <label>Ukuran Font Arab</label>
+                <input type="range" id="font-slider" min="20" max="60" value="30" oninput="updateFontSize(this.value)">
+            </div>
+            <div class="setting-item">
+                <div class="flex-between"><span>Tajwid Berwarna</span><input type="checkbox" id="tajwid-toggle" checked onchange="toggleTajwid()"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="ramadan.js"></script>
+    <script src="quran.js"></script>
+</body>
+</html>
