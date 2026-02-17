@@ -1,83 +1,131 @@
-// 1. ZAKAT CALCULATOR
-function hitungZakat() {
-    // Fitrah
-    const hargaBeras = document.getElementById('harga-beras').value || 0;
-    const jiwa = document.getElementById('jumlah-jiwa').value || 0;
-    const totalFitrah = (2.5 * hargaBeras) * jiwa;
-    document.getElementById('total-zakat').innerText = "Rp " + totalFitrah.toLocaleString('id-ID');
-
-    // Maal
-    const harta = document.getElementById('total-harta').value || 0;
-    const totalMaal = harta * 0.025; // 2.5%
-    document.getElementById('total-maal').innerText = "Rp " + totalMaal.toLocaleString('id-ID');
-}
-
-// 2. TABS NAVIGATOR
-function switchTab(tabId) {
+// TAB NAVIGATION
+function switchTab(id) {
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    
-    document.getElementById(tabId).classList.add('active');
-    event.currentTarget.classList.add('active');
+    event.target.classList.add('active');
 }
 
-// 3. AMAL YAUMI TRACKER
-const amalData = [
-    { id: 's1', text: 'Sholat Subuh' },
-    { id: 's2', text: 'Sholat Dzuhur' },
-    { id: 's3', text: 'Sholat Ashar' },
-    { id: 's4', text: 'Sholat Maghrib' },
-    { id: 's5', text: 'Sholat Isya' },
-    { id: 's6', text: 'Tilawah Quran' },
-    { id: 's7', text: 'Sedekah' }
+// 1. TRACKER
+const amalList = [
+    {id:'w1', txt:'Sholat 5 Waktu', type:'Wajib'},
+    {id:'w2', txt:'Puasa Ramadan', type:'Wajib'},
+    {id:'s1', txt:'Sholat Tarawih', type:'Sunnah'},
+    {id:'s2', txt:'Tilawah 1 Juz', type:'Sunnah'},
+    {id:'s3', txt:'Sedekah Subuh', type:'Sunnah'}
 ];
-
-function initTracker() {
-    const list = document.getElementById('amal-list');
+function renderTracker() {
     let saved = JSON.parse(localStorage.getItem('amalTracker')) || {};
-    
-    list.innerHTML = amalData.map(item => `
-        <div style="display:flex; align-items:center; padding:12px; border-bottom:1px solid #222;">
-            <input type="checkbox" id="${item.id}" ${saved[item.id] ? 'checked' : ''} 
-                onchange="toggleAmal('${item.id}')" 
-                style="width:20px; height:20px; accent-color:#00A86B; margin-right:15px;">
-            <label for="${item.id}" style="font-size:14px;">${item.text}</label>
+    document.getElementById('tab-tracker').innerHTML = `
+        <div class="card-light">
+            <h4 style="margin-bottom:15px;">Amal Yaumi (Harian)</h4>
+            ${amalList.map(item => `
+                <div style="display:flex; align-items:center; padding:10px 0; border-bottom:1px solid #eee;">
+                    <input type="checkbox" id="${item.id}" ${saved[item.id]?'checked':''} 
+                        onchange="toggleAmal('${item.id}')" style="width:20px; height:20px; accent-color:var(--primary); margin-right:15px;">
+                    <div>
+                        <div style="font-weight:600;">${item.txt}</div>
+                        <small style="color:${item.type==='Wajib'?'red':'#888'}">${item.type}</small>
+                    </div>
+                </div>
+            `).join('')}
         </div>
-    `).join('');
-    
-    updateProgress();
+    `;
 }
-
 function toggleAmal(id) {
     let saved = JSON.parse(localStorage.getItem('amalTracker')) || {};
     saved[id] = document.getElementById(id).checked;
     localStorage.setItem('amalTracker', JSON.stringify(saved));
-    updateProgress();
 }
 
-function updateProgress() {
-    let saved = JSON.parse(localStorage.getItem('amalTracker')) || {};
-    let checkedCount = Object.values(saved).filter(v => v).length;
-    document.getElementById('amal-count').innerText = `${checkedCount}/${amalData.length}`;
+// 2. JADWAL
+function renderJadwal() {
+    document.getElementById('tab-jadwal').innerHTML = `
+        <div class="card-light">
+            <h4>Jadwal Imsakiyah (Jakarta)</h4>
+            <table class="prayer-table">
+                <thead><tr><th>Tgl</th><th>Imsak</th><th>Subuh</th><th>Maghrib</th></tr></thead>
+                <tbody>
+                    <tr><td>1 Ram</td><td style="color:var(--primary)">04:29</td><td>04:39</td><td style="color:red">18:15</td></tr>
+                    <tr><td>2 Ram</td><td style="color:var(--primary)">04:29</td><td>04:39</td><td style="color:red">18:15</td></tr>
+                    <tr><td>3 Ram</td><td style="color:var(--primary)">04:29</td><td>04:39</td><td style="color:red">18:15</td></tr>
+                </tbody>
+            </table>
+        </div>
+    `;
 }
 
-// 4. COUNTDOWN TIMER (Simulasi)
-setInterval(() => {
-    const now = new Date();
-    // Target Maghrib (Contoh 18:15)
-    const target = new Date();
-    target.setHours(18, 15, 0);
-    
-    if(now > target) target.setDate(target.getDate() + 1);
-    
-    const diff = target - now;
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-    
-    document.getElementById('countdown-timer').innerText = 
-        `${hours.toString().padStart(2,'0')}:${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
-}, 1000);
+// 3. DOA
+function renderDoa() {
+    document.getElementById('tab-doa').innerHTML = `
+        <div class="card-light">
+            <h4>Niat Puasa</h4>
+            <p style="font-family:'Amiri'; font-size:24px; text-align:right; margin:10px 0;">نَوَيْتُ صَوْمَ غَدٍ عَنْ أَدَاءِ فَرْضِ شَهْرِ رَمَضَانَ</p>
+            <p style="font-style:italic;">Nawaitu shauma ghadin...</p>
+        </div>
+        <div class="card-light">
+            <h4>Doa Berbuka</h4>
+            <p style="font-family:'Amiri'; font-size:24px; text-align:right; margin:10px 0;">اللَّهُمَّ لَكَ صُمْتُ وَعَلَى رِزْقِكَ أَفْطَرْتُ</p>
+            <p style="font-style:italic;">Allahumma laka shumtu...</p>
+        </div>
+    `;
+}
 
-// Jalankan Tracker saat load
-document.addEventListener('DOMContentLoaded', initTracker);
+// 4. ZAKAT
+function renderZakat() {
+    document.getElementById('tab-zakat').innerHTML = `
+        <div class="card-light">
+            <h4>Kalkulator Zakat Fitrah</h4>
+            <div style="margin:10px 0;">
+                <label>Harga Beras/Kg</label>
+                <input type="number" id="harga-beras" value="15000" oninput="calcZakat()" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;">
+            </div>
+            <div style="margin:10px 0;">
+                <label>Jumlah Jiwa</label>
+                <input type="number" id="jml-jiwa" value="1" oninput="calcZakat()" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;">
+            </div>
+            <div style="background:#e8f5e9; padding:15px; border-radius:10px; text-align:center; margin-top:15px;">
+                <small>Total Bayar</small>
+                <h2 id="total-zakat" style="color:var(--primary); margin:0;">Rp 37.500</h2>
+            </div>
+        </div>
+    `;
+}
+function calcZakat() {
+    const h = document.getElementById('harga-beras').value;
+    const j = document.getElementById('jml-jiwa').value;
+    const tot = (h * 2.5) * j;
+    document.getElementById('total-zakat').innerText = "Rp " + tot.toLocaleString('id-ID');
+}
+
+// 5. RAPOR
+function renderRapor() {
+    document.getElementById('tab-rapor').innerHTML = `
+        <div class="rapor-card">
+            <div style="font-size:50px; margin-bottom:10px;">🏆</div>
+            <h3>Rapor Ramadan Kamu</h3>
+            <div style="background:white; color:#333; padding:10px; border-radius:10px; margin:20px 0;">
+                <small>PREDIKAT</small>
+                <h4>Sangat Baik ⭐</h4>
+            </div>
+            <button class="btn-download" onclick="alert('Mendownload Rapor...')">Download Gambar</button>
+        </div>
+    `;
+}
+
+// INIT ALL
+document.addEventListener('DOMContentLoaded', () => {
+    renderTracker(); renderJadwal(); renderDoa(); renderZakat(); renderRapor();
+});
+
+// TASBIH LOGIC
+let tCount = 0;
+function countTasbih() {
+    tCount++;
+    document.getElementById('tasbih-number').innerText = tCount;
+    if(navigator.vibrate) navigator.vibrate(40);
+}
+function resetTasbih(e) {
+    e.stopPropagation(); tCount = 0;
+    document.getElementById('tasbih-number').innerText = 0;
+}
