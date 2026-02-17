@@ -3,21 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Rifqy Al-Qur'an</title>
+    <title>Rifqy Al-Qur'an Pro</title>
     
     <link rel="stylesheet" href="style.css">
     
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 </head>
 <body class="oled-theme">
 
     <header class="main-header" id="main-header">
-        <div class="user-greeting">
-            <div class="avatar">R</div>
+        <div class="user-greeting" onclick="switchPage('akun')">
+            <div class="avatar" id="user-avatar">R</div>
             <div>
-                <p>Assalamu'alaikum 👋</p>
-                <small>Rifqy Al-Qur'an Professional</small>
+                <p id="greeting-text">Assalamu'alaikum 👋</p>
+                <small id="user-name-display">Tamu (Klik untuk Masuk)</small>
             </div>
         </div>
         <button class="icon-btn" onclick="openSettings()"><i class="fas fa-cog"></i></button>
@@ -32,16 +36,12 @@
                 <p class="hijri-date">29 Sha'ban 1447H</p>
                 <div class="stats-row">
                     <div class="stat-item">
-                        <span>MENUJU BERBUKA</span>
+                        <span>MENUJU MAGHRIB</span>
                         <strong id="countdown-timer">00:00:00</strong>
                     </div>
                     <div class="stat-item">
-                        <span>KHATAM</span>
+                        <span>PROGRESS</span>
                         <strong id="khatam-progress">0%</strong>
-                    </div>
-                    <div class="stat-item">
-                        <span>AMAL</span>
-                        <strong id="amal-count">0/5</strong>
                     </div>
                 </div>
             </div>
@@ -74,7 +74,7 @@
 
         <section id="read-view" class="page">
             <div class="read-header">
-                <button onclick="switchPage('dashboard')"><i class="fas fa-arrow-left"></i></button>
+                <button onclick="backToHome()"><i class="fas fa-arrow-left"></i></button>
                 <h3 id="current-surah-name">Surat</h3>
                 <button onclick="toggleAudio()"><i class="fas fa-play" id="btn-header-play"></i></button>
             </div>
@@ -86,49 +86,44 @@
                 <button onclick="switchPage('dashboard')"><i class="fas fa-arrow-left"></i></button>
                 <h3>Ramadan Tools</h3>
             </div>
-
+            
             <div class="tab-nav">
                 <button class="tab-btn active" onclick="switchTab('tab-tracker')">Tracker</button>
+                <button class="tab-btn" onclick="switchTab('tab-jadwal')">Jadwal</button>
+                <button class="tab-btn" onclick="switchTab('tab-doa')">Doa</button>
                 <button class="tab-btn" onclick="switchTab('tab-zakat')">Zakat</button>
+                <button class="tab-btn" onclick="switchTab('tab-rapor')">Rapor</button>
             </div>
 
-            <div id="tab-tracker" class="tab-content active">
-                <div class="card-box">
-                    <h4>Amal Yaumi (Harian)</h4>
-                    <div id="amal-list">
-                        </div>
-                </div>
+            <div id="ramadan-content-area" class="light-mode-container">
+                <div id="tab-tracker" class="tab-content active"></div>
+                <div id="tab-jadwal" class="tab-content"></div>
+                <div id="tab-doa" class="tab-content"></div>
+                <div id="tab-zakat" class="tab-content"></div>
+                <div id="tab-rapor" class="tab-content"></div>
             </div>
+        </section>
 
-            <div id="tab-zakat" class="tab-content">
-                <div class="card-box">
-                    <h4><i class="fas fa-calculator"></i> Zakat Fitrah</h4>
-                    <div class="input-group">
-                        <label>Harga Beras (per Kg)</label>
-                        <input type="number" id="harga-beras" value="15000" oninput="hitungZakat()">
-                    </div>
-                    <div class="input-group">
-                        <label>Jumlah Jiwa</label>
-                        <input type="number" id="jumlah-jiwa" value="1" oninput="hitungZakat()">
-                    </div>
-                    <div class="result-box">
-                        <small>Total Bayar</small>
-                        <h2 id="total-zakat">Rp 37.500</h2>
-                    </div>
+        <section id="tasbih" class="page">
+            <div class="tasbih-container" onclick="countTasbih()">
+                <div class="tasbih-circle">
+                    <h2 id="tasbih-number">0</h2>
+                    <small>Ketuk layar</small>
                 </div>
+                <button class="btn-reset" onclick="resetTasbih(event)"><i class="fas fa-rotate-right"></i> Reset</button>
+            </div>
+        </section>
+
+        <section id="akun" class="page">
+            <div class="account-card">
+                <i class="fas fa-user-circle" style="font-size: 80px; color: var(--primary); margin-bottom: 20px;"></i>
+                <h3 id="acc-name">Belum Masuk</h3>
+                <p id="acc-email" style="color:#888; margin-bottom: 30px;">Masuk untuk menyimpan progress khatam & tracker.</p>
                 
-                <div class="card-box" style="margin-top:15px;">
-                    <h4><i class="fas fa-coins"></i> Zakat Maal</h4>
-                    <p style="font-size:12px; color:#888;">Nisab: Setara 85 gram emas</p>
-                    <div class="input-group">
-                        <label>Total Harta (Rp)</label>
-                        <input type="number" id="total-harta" placeholder="0" oninput="hitungZakat()">
-                    </div>
-                    <div class="result-box">
-                        <small>Zakat Maal (2.5%)</small>
-                        <h2 id="total-maal">Rp 0</h2>
-                    </div>
-                </div>
+                <button id="btn-login" class="btn-google" onclick="loginGoogle()">
+                    <i class="fab fa-google"></i> Masuk dengan Google
+                </button>
+                <button id="btn-logout" class="btn-logout hidden" onclick="logoutGoogle()">Keluar</button>
             </div>
         </section>
 
@@ -136,44 +131,57 @@
 
     <nav class="bottom-nav">
         <div class="nav-item active" onclick="switchPage('dashboard')">
-            <i class="fas fa-book-open"></i>
-            <span>Quran</span>
+            <i class="fas fa-book-open"></i><span>Quran</span>
         </div>
-        <div class="nav-item">
-            <i class="fas fa-circle-dot"></i>
-            <span>Tasbih</span>
+        <div class="nav-item" onclick="switchPage('tasbih')">
+            <i class="fas fa-circle-dot"></i><span>Tasbih</span>
         </div>
         <div class="nav-item-center" onclick="switchPage('ramadan')">
-            <div class="center-circle">
-                <i class="fas fa-star-and-crescent"></i>
-            </div>
+            <div class="center-circle"><i class="fas fa-star-and-crescent"></i></div>
         </div>
         <div class="nav-item">
-            <i class="fas fa-heart"></i>
-            <span>Simpan</span>
+            <i class="fas fa-bookmark"></i><span>Simpan</span>
         </div>
-        <div class="nav-item">
-            <i class="fas fa-user"></i>
-            <span>Akun</span>
+        <div class="nav-item" onclick="switchPage('akun')">
+            <i class="fas fa-user"></i><span>Akun</span>
         </div>
     </nav>
 
     <div id="modal-settings" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>PENGATURAN OLED</h3>
+                <h3>PENGATURAN TAMPILAN</h3>
                 <i class="fas fa-times" onclick="closeSettings()"></i>
             </div>
-            <div class="setting-item">
+            
+            <div class="setting-group">
                 <label>Ukuran Font Arab</label>
-                <input type="range" id="font-slider" min="20" max="60" value="30" oninput="updateFontSize(this.value)">
+                <input type="range" min="20" max="60" value="30" oninput="updateFontSize(this.value, 'arab')">
             </div>
-            <div class="setting-item">
-                <div class="flex-between"><span>Tajwid Berwarna</span><input type="checkbox" id="tajwid-toggle" checked onchange="toggleTajwid()"></div>
+
+            <div class="setting-group">
+                <label>Ukuran Font Latin</label>
+                <input type="range" min="12" max="24" value="14" oninput="updateFontSize(this.value, 'latin')">
+            </div>
+
+            <div class="setting-list">
+                <div class="flex-between">
+                    <span>Teks Latin</span>
+                    <input type="checkbox" checked onchange="toggleView('latin')">
+                </div>
+                <div class="flex-between">
+                    <span>Terjemahan</span>
+                    <input type="checkbox" checked onchange="toggleView('trans')">
+                </div>
+                <div class="flex-between">
+                    <span>Tajwid Berwarna</span>
+                    <input type="checkbox" checked id="toggle-tajwid" onchange="toggleTajwid()">
+                </div>
             </div>
         </div>
     </div>
 
+    <script src="auth.js"></script>
     <script src="ramadan.js"></script>
     <script src="quran.js"></script>
 </body>
