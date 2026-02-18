@@ -3,61 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Rifqy Al-Qur'an Pro 2026</title>
-    
+    <title>Rifqy Al-Qur'an Pro (Ramadhan 2026)</title>
     <link rel="stylesheet" href="style.css">
-    
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+    
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 </head>
 <body class="oled-theme">
 
-    <div class="app-container">
-        <aside class="desktop-sidebar">
-            <div class="brand">
-                <div class="logo-circle">R</div>
-                <h3>Rifqy Quran</h3>
-            </div>
-            <nav class="desktop-nav">
-                <a href="#" onclick="switchPage('dashboard')" class="active"><i class="fas fa-home"></i> Beranda</a>
-                <a href="#" onclick="switchPage('ramadan')"><i class="fas fa-moon"></i> Ramadan</a>
-                <a href="#" onclick="switchPage('tasbih')"><i class="fas fa-circle-dot"></i> Tasbih</a>
-                <a href="#" onclick="switchPage('akun')"><i class="fas fa-user"></i> Akun</a>
-            </nav>
-        </aside>
+    <aside class="desktop-sidebar">
+        <div class="brand">
+            <div class="logo-circle">R</div>
+            <h3>Rifqy Quran</h3>
+        </div>
+        <nav class="desktop-nav">
+            <button onclick="switchPage('dashboard')" class="active"><i class="fas fa-home"></i> Beranda</button>
+            <button onclick="switchPage('ramadan')"><i class="fas fa-moon"></i> Ramadhan Tools</button>
+            <button onclick="switchPage('tasbih')"><i class="fas fa-fingerprint"></i> Tasbih</button>
+            <button onclick="switchPage('akun')"><i class="fas fa-user"></i> Akun</button>
+        </nav>
+    </aside>
 
-        <main id="app-content">
-            
-            <header class="main-header mobile-only">
+    <main id="app-content">
+        <section id="dashboard" class="page active">
+            <header class="main-header">
                 <div class="user-greeting" onclick="switchPage('akun')">
                     <div class="avatar" id="user-avatar-mobile">R</div>
                     <div>
-                        <p>Assalamualaikum</p>
+                        <p>Ahlan Wa Sahlan 👋</p>
                         <small id="user-name-mobile">Tamu</small>
                     </div>
                 </div>
                 <button class="icon-btn" onclick="openSettings()"><i class="fas fa-cog"></i></button>
             </header>
 
-            <section id="dashboard" class="page active">
-                <div class="desktop-header desktop-only">
-                    <h1>Dashboard</h1>
-                    <button class="icon-btn" onclick="openSettings()"><i class="fas fa-cog"></i> Pengaturan</button>
-                </div>
-
+            <div class="scroll-content">
                 <div class="ramadan-card" onclick="switchPage('ramadan')">
-                    <div class="card-badge">🌙 RAMADAN 1447H</div>
-                    <h3 id="hijri-date-display">1 Ramadan 1447H</h3>
-                    <p class="location-text"><i class="fas fa-location-dot"></i> Jakarta, Indonesia</p>
+                    <div class="card-badge">🌙 1447 HIJRIAH</div>
+                    <h2 id="hijri-date-display">1 Ramadhan 1447H</h2>
+                    <p class="location-text"><i class="fas fa-map-pin"></i> Jakarta, Indonesia</p>
                     
                     <div class="stats-row">
                         <div class="stat-item">
                             <span id="label-countdown">MENUJU BERBUKA</span>
-                            <strong id="countdown-timer" style="font-size: 24px;">00:00:00</strong>
+                            <strong id="countdown-timer">00:00:00</strong>
                         </div>
                         <div class="stat-item">
                             <span>KHATAM</span>
@@ -66,8 +58,6 @@
                     </div>
                 </div>
 
-                <div id="last-read-container"></div>
-                
                 <div class="section-header">
                     <h3>Daftar Surat</h3>
                     <div class="search-box">
@@ -77,91 +67,86 @@
                 </div>
                 
                 <div id="surah-list-container" class="grid-surah">
-                    <div class="loading">Memuat Surat...</div>
+                    <div class="loading">Memuat Data Quran...</div>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <section id="read-view" class="page">
-                <div class="read-header">
-                    <button onclick="backToHome()"><i class="fas fa-arrow-left"></i></button>
+        <section id="read-view" class="page">
+            <div class="read-header">
+                <button onclick="backToHome()"><i class="fas fa-arrow-left"></i></button>
+                <div class="header-title">
                     <h3 id="current-surah-name">Surat</h3>
+                    <small id="current-surah-info">Loading...</small>
+                </div>
+                <div class="header-actions">
                     <button onclick="toggleAudio()"><i class="fas fa-play" id="btn-header-play"></i></button>
+                    <button onclick="openSettings()"><i class="fas fa-font"></i></button>
                 </div>
-                <div id="ayah-container" class="ayah-list"></div>
-            </section>
+            </div>
+            <div id="ayah-container" class="ayah-list"></div>
+        </section>
 
-            <section id="ramadan" class="page">
-                <div class="read-header mobile-only">
-                    <button onclick="switchPage('dashboard')"><i class="fas fa-arrow-left"></i></button>
-                    <h3>Ramadan Pro</h3>
-                </div>
-                <div class="desktop-header desktop-only">
-                    <h1>Ramadan Tools</h1>
-                </div>
-                
-                <div class="tab-nav-scroll">
-                    <button class="tab-btn active" onclick="switchTab('tab-jadwal')">Jadwal Full</button>
-                    <button class="tab-btn" onclick="switchTab('tab-doa')">Kumpulan Doa</button>
-                    <button class="tab-btn" onclick="switchTab('tab-tracker')">Tracker</button>
-                    <button class="tab-btn" onclick="switchTab('tab-zakat')">Zakat</button>
-                    <button class="tab-btn" onclick="switchTab('tab-rapor')">Rapor</button>
-                </div>
+        <section id="ramadan" class="page">
+            <div class="read-header">
+                <button onclick="switchPage('dashboard')"><i class="fas fa-arrow-left"></i></button>
+                <h3>Ramadhan 2026</h3>
+            </div>
+            
+            <div class="tab-nav-scroll">
+                <button class="tab-btn active" onclick="switchTab('tab-jadwal')">Jadwal 30 Hari</button>
+                <button class="tab-btn" onclick="switchTab('tab-doa')">Kumpulan Doa</button>
+                <button class="tab-btn" onclick="switchTab('tab-tracker')">Tracker</button>
+                <button class="tab-btn" onclick="switchTab('tab-zakat')">Zakat</button>
+            </div>
 
-                <div id="ramadan-content-area" class="light-mode-container">
-                    <div id="tab-jadwal" class="tab-content active">
-                        <div class="card-light">
-                            <div class="flex-between">
-                                <h4>Jadwal Imsakiyah 2026</h4>
-                                <small style="color:var(--primary)"><i class="fas fa-map-marker-alt"></i> Jakarta</small>
-                            </div>
-                            <div class="table-responsive">
-                                <table class="prayer-table full-width">
-                                    <thead><tr><th>Tgl</th><th>Imsak</th><th>Subuh</th><th>Maghrib</th></tr></thead>
-                                    <tbody id="jadwal-body">
-                                        </tbody>
-                                </table>
-                            </div>
+            <div class="light-mode-container">
+                <div id="tab-jadwal" class="tab-content active">
+                    <div class="card-light">
+                        <h4 class="mb-2">Jadwal Imsakiyah Jakarta</h4>
+                        <small class="text-muted">Mulai Kamis, 19 Feb 2026</small>
+                        <div class="table-responsive">
+                            <table class="prayer-table">
+                                <thead><tr><th>Tgl</th><th>Imsak</th><th>Subuh</th><th>Maghrib</th></tr></thead>
+                                <tbody id="jadwal-body"></tbody>
+                            </table>
                         </div>
                     </div>
-
-                    <div id="tab-doa" class="tab-content">
-                        <div id="doa-list-container">
-                            </div>
-                    </div>
-
-                    <div id="tab-tracker" class="tab-content"></div>
-                    <div id="tab-zakat" class="tab-content"></div>
-                    <div id="tab-rapor" class="tab-content"></div>
                 </div>
-            </section>
 
-            <section id="tasbih" class="page">
-                <div class="tasbih-container" onclick="countTasbih()">
-                    <div class="tasbih-circle">
-                        <h2 id="tasbih-number">0</h2>
-                        <small>Ketuk Layar / Spasi</small>
-                    </div>
-                    <button class="btn-reset" onclick="resetTasbih(event)"><i class="fas fa-rotate-right"></i> Reset</button>
+                <div id="tab-doa" class="tab-content">
+                    <div id="doa-list-container"></div>
                 </div>
-            </section>
 
-            <section id="akun" class="page">
-                <div class="account-card">
-                    <i class="fas fa-user-circle" style="font-size: 80px; color: var(--primary); margin-bottom: 20px;"></i>
-                    <h3 id="acc-name">Belum Masuk</h3>
-                    <p id="acc-email" style="color:#888; margin-bottom: 30px;">Masuk dengan Google untuk menyimpan data.</p>
-                    <button id="btn-login" class="btn-google" onclick="loginGoogle()">
-                        <i class="fab fa-google"></i> Masuk dengan Google
-                    </button>
-                    <button id="btn-logout" class="btn-logout hidden" onclick="logoutGoogle()">Keluar</button>
+                <div id="tab-tracker" class="tab-content"></div>
+                <div id="tab-zakat" class="tab-content"></div>
+            </div>
+        </section>
+
+        <section id="tasbih" class="page">
+            <div class="tasbih-container" onclick="countTasbih()">
+                <div class="tasbih-circle">
+                    <h2 id="tasbih-number">0</h2>
+                    <small>Ketuk Layar</small>
                 </div>
-            </section>
-        </main>
-    </div>
+                <button class="btn-reset" onclick="resetTasbih(event)"><i class="fas fa-rotate-right"></i> Reset</button>
+            </div>
+        </section>
+
+        <section id="akun" class="page">
+            <div class="account-card">
+                <i class="fas fa-user-circle" style="font-size: 80px; color: var(--primary); margin-bottom: 20px;"></i>
+                <h3 id="acc-name">Belum Masuk</h3>
+                <p id="acc-email" style="color:#888;">Simpan progress khatam & tracker.</p>
+                <button id="btn-login" class="btn-google" onclick="loginGoogle()"><i class="fab fa-google"></i> Masuk dengan Google</button>
+                <button id="btn-logout" class="btn-logout hidden" onclick="logoutGoogle()">Keluar</button>
+            </div>
+        </section>
+    </main>
 
     <nav class="bottom-nav mobile-only">
         <div class="nav-item active" onclick="switchPage('dashboard')"><i class="fas fa-book-open"></i><span>Quran</span></div>
-        <div class="nav-item" onclick="switchPage('tasbih')"><i class="fas fa-circle-dot"></i><span>Tasbih</span></div>
+        <div class="nav-item" onclick="switchPage('tasbih')"><i class="fas fa-fingerprint"></i><span>Tasbih</span></div>
         <div class="nav-item-center" onclick="switchPage('ramadan')"><div class="center-circle"><i class="fas fa-star-and-crescent"></i></div></div>
         <div class="nav-item"><i class="fas fa-bookmark"></i><span>Simpan</span></div>
         <div class="nav-item" onclick="switchPage('akun')"><i class="fas fa-user"></i><span>Akun</span></div>
@@ -170,21 +155,23 @@
     <div id="modal-settings" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>PENGATURAN TAMPILAN</h3>
+                <h3>TAMPILAN & FONT</h3>
                 <i class="fas fa-times" onclick="closeSettings()"></i>
             </div>
+            
             <div class="setting-group">
-                <label>Ukuran Font Arab</label>
+                <label>Ukuran Arab: <span id="lbl-arab">30px</span></label>
                 <input type="range" min="20" max="60" value="30" oninput="updateFontSize(this.value, 'arab')">
             </div>
+
             <div class="setting-group">
-                <label>Ukuran Font Latin</label>
-                <input type="range" min="12" max="24" value="14" oninput="updateFontSize(this.value, 'latin')">
+                <label>Ukuran Latin/Terjemahan: <span id="lbl-latin">14px</span></label>
+                <input type="range" min="12" max="30" value="14" oninput="updateFontSize(this.value, 'latin')">
             </div>
+
             <div class="setting-list">
-                <div class="flex-between"><span>Teks Latin</span><input type="checkbox" checked onchange="toggleView('latin')"></div>
-                <div class="flex-between"><span>Terjemahan</span><input type="checkbox" checked onchange="toggleView('trans')"></div>
-                <div class="flex-between"><span>Tajwid Berwarna</span><input type="checkbox" checked id="toggle-tajwid" onchange="toggleTajwid()"></div>
+                <div class="flex-between"><span>Teks Latin</span><label class="switch"><input type="checkbox" checked onchange="toggleView('latin')"><span class="slider"></span></label></div>
+                <div class="flex-between"><span>Terjemahan</span><label class="switch"><input type="checkbox" checked onchange="toggleView('trans')"><span class="slider"></span></label></div>
             </div>
         </div>
     </div>
